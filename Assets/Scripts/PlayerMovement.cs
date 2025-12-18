@@ -74,6 +74,7 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("Jump pressed!");
         }
     }
+
     public void OnRun(InputAction.CallbackContext context)
     {
         if (context.started)
@@ -84,4 +85,17 @@ public class PlayerMovement : MonoBehaviour
         else if (context.canceled)
             isRunning = false;
     }
+
+    public void OnShowTime(InputAction.CallbackContext context)
+    {
+        Debug.Log("T pressed!");
+        if (TimeLoopManager.Instance == null)
+            return;
+
+        if (context.started)
+            TimeLoopManager.Instance.ShowTime(true);
+        else if (context.canceled)
+            TimeLoopManager.Instance.ShowTime(false);
+    }
+
 }

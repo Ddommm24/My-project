@@ -93,6 +93,13 @@ public class TimeLoopManager : MonoBehaviour
         }
     }
 
+    public void ResetLoopFromDeath()
+    {
+        Debug.Log("PLAYER DIED — RESETTING LOOP");
+        ResetLoop();
+    }
+
+
     public float GetTimeRemaining()
     {
         return timeRemaining;

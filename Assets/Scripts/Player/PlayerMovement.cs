@@ -22,6 +22,18 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 moveInput;
     private bool jumpPressed;
     private bool isRunning;
+    private PlayerStats playerStats;
+
+
+    void OnEnable()
+    {
+        playerStats = GetComponent<PlayerStats>();
+
+        if (playerStats == null)
+        {
+            Debug.LogError("PlayerStats not found on Player!");
+        }
+    }
 
     // Update is called once per frame
     void Update()
@@ -34,6 +46,11 @@ public class PlayerMovement : MonoBehaviour
             velocity.y = -2f;
         }
 
+        if (isRunning && !playerStats.CanSprint())
+        {
+            isRunning = false;
+        }
+        
         float currentSpeed = isRunning ? runSpeed : speed;
 
         // Get movement relative to camera
@@ -71,24 +88,26 @@ public class PlayerMovement : MonoBehaviour
         if (context.started)
         {
             jumpPressed = true;
-            Debug.Log("Jump pressed!");
         }
     }
 
     public void OnRun(InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (playerStats == null)
+            return;
+
+        if (context.started && playerStats.CanSprint())
         {
             isRunning = true;
-            Debug.Log("Is running!");
         }
         else if (context.canceled)
+        {
             isRunning = false;
+        }
     }
 
     public void OnShowTime(InputAction.CallbackContext context)
     {
-        Debug.Log("T pressed!");
         if (TimeLoopManager.Instance == null)
             return;
 

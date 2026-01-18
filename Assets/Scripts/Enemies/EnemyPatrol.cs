@@ -1,11 +1,19 @@
 using UnityEngine;
 using UnityEngine.AI;
 
+[System.Serializable]
+public struct EnemyPatrolState
+{
+    public int currentWaypoint;
+    public float waypointProgress;
+}
+
 public class EnemyPatrol : MonoBehaviour, ILoopResettable
 {
     public Transform waypointParent;
     public float patrolSpeed = 2f;
     public float waitTimeAtPoint = 1f;
+    public bool patrolEnabled = true;
 
     public int GetCurrentWaypointIndex()
     {
@@ -24,6 +32,9 @@ public class EnemyPatrol : MonoBehaviour, ILoopResettable
 
     void Start()
     {
+        if (!patrolEnabled)
+        return;
+
         agent = GetComponent<NavMeshAgent>();
         agent.speed = patrolSpeed;
 
@@ -39,16 +50,18 @@ public class EnemyPatrol : MonoBehaviour, ILoopResettable
 
     void Update()
     {
+        if (!patrolEnabled) return;
         if (!isPatrolling) return;
         if (agent.pathPending) return;
 
-        if (!agent.pathPending && agent.remainingDistance < 0.3f)
+        if (agent.remainingDistance <= agent.stoppingDistance)
         {
             waitTimer += Time.deltaTime;
 
             if (waitTimer >= waitTimeAtPoint)
             {
-                GoToNextPoint();
+                currentIndex = (currentIndex + 1) % patrolPoints.Length;
+                agent.SetDestination(patrolPoints[currentIndex].position);
                 waitTimer = 0f;
             }
         }
@@ -56,12 +69,14 @@ public class EnemyPatrol : MonoBehaviour, ILoopResettable
 
     void GoToNextPoint()
     {
-        if (patrolPoints.Length == 0) return;
+        if (!patrolEnabled) return;
+        if (agent == null) return;
+        if (patrolPoints == null || patrolPoints.Length == 0) return;
 
         agent.speed = patrolSpeed;
         agent.SetDestination(patrolPoints[currentIndex].position);
-        currentIndex = (currentIndex + 1) % patrolPoints.Length;
     }
+
 
     // 🔹 CALLED BY EnemyAI
     public void StopPatrol()
@@ -72,10 +87,47 @@ public class EnemyPatrol : MonoBehaviour, ILoopResettable
     // 🔹 CALLED BY EnemyAI
     public void ResumePatrol()
     {
+        if (!patrolEnabled) return;
+        if (agent == null || patrolPoints == null || patrolPoints.Length == 0)
+            return;
+
         if (isPatrolling) return;
 
         isPatrolling = true;
         GoToNextPoint();
+    }
+
+
+    public EnemyPatrolState GetState()
+    {
+        return new EnemyPatrolState
+        {
+            currentWaypoint = currentIndex,
+            waypointProgress = 0f // unused, but keeps struct valid
+        };
+    }
+
+    public void SetState(EnemyPatrolState state)
+    {
+        currentIndex = state.currentWaypoint;
+
+        if (agent != null && agent.enabled)
+        {
+            agent.ResetPath();
+            agent.SetDestination(patrolPoints[currentIndex].position);
+        }
+
+        ResumePatrol();
+    }
+
+    public int GetCurrentIndex()
+    {
+        return currentIndex;
+    }
+
+    public void SetPatrolIndex(int index)
+    {
+        currentIndex = index;
     }
 
     public void ResetState()

@@ -1,75 +1,86 @@
-using UnityEngine; 
+using UnityEngine;
 using TMPro;
 
-public class Inspect : MonoBehaviour 
-{ 
-    public TMP_Text inspectText;
+public class Inspect : MonoBehaviour, IInteractable
+{
     public TMP_Text descriptionText;
-    private bool inspecting = false;
+    public bool requiresUnlock = false;
+    public bool unlocked = true;
+
+    public int codeIndex = -1; // 0–3, -1 = normal inspect
+
+    public int Priority => 10;
+    
+    public FacilityClock clockSource;
+
     [TextArea(5, 10)]
-    public string description = "Default";
+    public string description;
 
-    [Header("Interaction")] 
-    public float interactDistance = 3f; 
+    private bool inspecting;
 
-    private Camera cam; 
-    
-    void Start() 
-    { 
-        cam = Camera.main; 
-        inspectText.gameObject.SetActive(false);
-        descriptionText.gameObject.SetActive(false);
-    } 
-    
-    void Update() 
-    { 
-        CheckForLook();
+    void Start()
+    {
+        if (descriptionText != null)
+            descriptionText.gameObject.SetActive(false);
+    }
 
-        if (inspecting && Input.GetKeyDown(KeyCode.Escape))
+    public bool CanInteract()
+    {
+        if (requiresUnlock && !unlocked)
+            return false;
+
+        return !inspecting;
+    }
+
+    public string GetPromptText()
+    {
+        return "Press E to Inspect";
+    }
+
+    public void Interact()
+    {
+        inspecting = true;
+        descriptionText.gameObject.SetActive(true);
+
+        if (codeIndex == 1 && DoorCodeManager.Instance != null)
         {
-            ExitInspect();
+            int number = DoorCodeManager.Instance.GetNumber(codeIndex);
+            descriptionText.text = description + number;
+        }
+        else if (codeIndex == 2 && DoorCodeManager.Instance != null)
+        {
+            int number = DoorCodeManager.Instance.GetNumber(codeIndex);
+            descriptionText.text = description + number + " Hedgefield Drive";
+        }
+        else if (codeIndex == 3 && DoorCodeManager.Instance != null)
+        {
+            int number = DoorCodeManager.Instance.GetNumber(codeIndex);
+            descriptionText.text = description + number;
+        }
+        else if (clockSource != null)
+        {
+            descriptionText.text = clockSource.GetClockText();
+        }
+        else
+        {
+            descriptionText.text = description;
         }
     }
-    
-    void CheckForLook() 
-    { 
-        if (inspecting) return;
 
-        Ray ray = new Ray(cam.transform.position, cam.transform.forward); 
-        RaycastHit hit; 
-        
-        if (Physics.Raycast(ray, out hit, interactDistance))
-        { 
-            if (hit.collider.GetComponentInParent<Inspect>() == this)
-            { 
-                inspectText.gameObject.SetActive(true);
-                inspectText.text = "Press E to Inspect"; 
-                
-                if (Input.GetKeyDown(KeyCode.E)) 
-                { 
-                    InspectItem(); 
-                } 
-
-                return; 
-            } 
-        } 
-        
-        inspectText.gameObject.SetActive(false); 
-    } 
-    
-    void InspectItem() 
-    { 
-        inspecting = true; 
-        inspectText.gameObject.SetActive(false);
-        descriptionText.gameObject.SetActive(true);
-        descriptionText.text = description;
-    } 
-
-    void ExitInspect()
+    void Update()
     {
-        inspecting = false;
-        inspectText.gameObject.SetActive(false);
-        descriptionText.gameObject.SetActive(false);
+        if (!inspecting) return;
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Close();
+        }
+
     }
 
+    void Close()
+    {
+        inspecting = false;
+        descriptionText.gameObject.SetActive(false);
+    }
 }

@@ -13,11 +13,19 @@ public class EnemyVision : MonoBehaviour
 
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
-    }
+        GameObject p = GameObject.FindGameObjectWithTag("Player");
+        if (p != null)
+            player = p.transform;
+        }
 
     void Update()
     {
+        if (player == null)
+        {
+            CanSeePlayer = false;
+            return;
+        }
+        
         CanSeePlayer = false;
 
         Vector3 direction = (player.position - transform.position).normalized;

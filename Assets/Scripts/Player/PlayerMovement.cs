@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public static PlayerMovement Instance { get; private set; }
+
     public CharacterController controller;
     public Transform cameraTransform;
 
@@ -33,6 +35,14 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.LogError("PlayerStats not found on Player!");
         }
+    }
+
+    void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
     }
 
     // Update is called once per frame
@@ -108,13 +118,26 @@ public class PlayerMovement : MonoBehaviour
 
     public void OnShowTime(InputAction.CallbackContext context)
     {
-        if (TimeLoopManager.Instance == null)
-            return;
-
         if (context.started)
+        {
             TimeLoopManager.Instance.ShowTime(true);
+        }
         else if (context.canceled)
+        {
             TimeLoopManager.Instance.ShowTime(false);
+        }
+    }
+
+    public void Stun(float duration)
+    {
+        StartCoroutine(StunRoutine(duration));
+    }
+
+    IEnumerator StunRoutine(float duration)
+    {
+        enabled = false;
+        yield return new WaitForSeconds(duration);
+        enabled = true;
     }
 
 }

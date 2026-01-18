@@ -1,86 +1,43 @@
 using UnityEngine;
-using TMPro;
+using System.Collections;
 
-public class OpenDrawer : MonoBehaviour
+public class OpenDrawer : MonoBehaviour, IInteractable, ILoopResettable
 {
-    public TMP_Text promptText;
-
-    [Header("Movement")]
     public Vector3 openOffset = new Vector3(0, 0, 0.35f);
     public float moveSpeed = 4f;
 
-    [Header("Interaction")]
-    public float interactDistance = 3f;
-
-    private Camera cam;
     private Vector3 closedPos;
     private Vector3 openPos;
     private bool isOpen;
     private bool isMoving;
 
+    public int Priority => 10;
+
     void Start()
     {
-        cam = Camera.main;
         closedPos = transform.localPosition;
         openPos = closedPos + openOffset;
-
-        promptText.gameObject.SetActive(false);
     }
 
-    void Update()
+    public bool CanInteract()
     {
-        if (ReadBook.IsReading)
-        return;
-
-        CheckForLook();
+        return !isMoving;
     }
 
-    void CheckForLook()
+    public string GetPromptText()
     {
-        Debug.DrawRay(cam.transform.position, cam.transform.forward * interactDistance, Color.red);
+        return isOpen ? "Press E to Close" : "Press E to Open";
+    }
 
+    public void Interact()
+    {
         if (isMoving) return;
 
-        Ray ray = new Ray(cam.transform.position, cam.transform.forward);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit, interactDistance))
-        {
-            // 🔹 FIRST: check if we're looking at a book
-            var book = hit.collider.GetComponentInParent<ReadBook>();
-            if (book != null)
-            {
-                promptText.gameObject.SetActive(false);
-                return;
-            }
-
-            // 🔹 THEN: check if we're looking at THIS drawer
-            if (hit.collider.GetComponentInParent<OpenDrawer>() == this)
-            {
-                promptText.gameObject.SetActive(true);
-                promptText.text = isOpen
-                    ? "Press E to close drawer"
-                    : "Press E to open drawer";
-
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    ToggleDrawer();
-                }
-
-                return;
-            }
-        }
-
-        promptText.gameObject.SetActive(false);
-    }
-
-    void ToggleDrawer()
-    {
         isOpen = !isOpen;
         StartCoroutine(MoveDrawer());
     }
 
-    System.Collections.IEnumerator MoveDrawer()
+    IEnumerator MoveDrawer()
     {
         isMoving = true;
         Vector3 target = isOpen ? openPos : closedPos;
@@ -92,11 +49,18 @@ public class OpenDrawer : MonoBehaviour
                 target,
                 moveSpeed * Time.deltaTime
             );
-
             yield return null;
         }
 
         transform.localPosition = target;
         isMoving = false;
+    }
+
+    public void ResetState()
+    {
+        StopAllCoroutines();
+        isOpen = false;
+        isMoving = false;
+        transform.localPosition = closedPos;
     }
 }

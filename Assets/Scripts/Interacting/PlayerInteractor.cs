@@ -7,7 +7,15 @@ public class PlayerInteractor : MonoBehaviour
     public LayerMask interactLayer;
     public TMP_Text promptText;
 
+    public Camera playerCamera;
+
     private IInteractable current;
+
+    void Start()
+    {
+        if (playerCamera == null)
+            playerCamera = Camera.main;
+    }
 
     void Update()
     {
@@ -16,26 +24,51 @@ public class PlayerInteractor : MonoBehaviour
         if (current != null && Input.GetKeyDown(KeyCode.E))
         {
             current.Interact();
-        }
+        }        
     }
 
     void CheckInteractable()
     {
-        if (promptText != null)
-        {
-            promptText.gameObject.SetActive(false);
-        }
-        
-        current = null;
+        if (ReadBook.IsReading)
+            return;
 
-        Ray ray = new Ray(transform.position, transform.forward);
-        if (Physics.Raycast(ray, out RaycastHit hit, interactDistance, interactLayer))
+        current = null;
+        promptText.gameObject.SetActive(false);
+
+        if (playerCamera == null)
+            return;
+
+        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+
+        //int mask = interactLayer;
+
+        if (Physics.Raycast(ray, out RaycastHit hit, interactDistance, interactLayer, QueryTriggerInteraction.Collide))
         {
-            IInteractable interactable = hit.collider.GetComponent<IInteractable>();
-            if (interactable != null && promptText != null)
+
+            IInteractable[] interactables = hit.collider.GetComponentsInParent<IInteractable>();
+
+            Debug.Log("Turtle hit: ");
+
+            IInteractable best = null;
+            int bestPriority = int.MinValue;
+
+            foreach (var i in interactables)
             {
-                current = interactable;
-                promptText.text = interactable.GetPromptText();
+                if (!i.CanInteract()) continue;
+
+                if (i.Priority > bestPriority)
+                {
+                    bestPriority = i.Priority;
+                    best = i;
+                }
+            }
+
+            if (best != null)
+            {
+                Debug.Log("Sloth hit: ");
+
+                current = best;
+                promptText.text = best.GetPromptText();
                 promptText.gameObject.SetActive(true);
             }
         }

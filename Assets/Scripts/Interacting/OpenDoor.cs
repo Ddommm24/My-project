@@ -1,14 +1,16 @@
 using UnityEngine;
 
-public class DoorResettable : MonoBehaviour, ILoopResettable
+public class OpenDoor : MonoBehaviour, IInteractable, ILoopResettable
 {
-    public Transform door;
+    public Transform door;          // assign DoorCube
     public Vector3 openOffset = new Vector3(0, 3f, 0);
     public float openSpeed = 3f;
 
-    private Vector3 closedPos;
-    private Vector3 openPos;
-    private bool isOpen;
+    public int Priority => 10;
+
+    Vector3 closedPos;
+    Vector3 openPos;
+    bool isOpen;
 
     void Start()
     {
@@ -26,7 +28,17 @@ public class DoorResettable : MonoBehaviour, ILoopResettable
         );
     }
 
-    public void OpenDoor()
+    public bool CanInteract()
+    {
+        return !isOpen;
+    }
+
+    public string GetPromptText()
+    {
+        return "Press E to Open Door";
+    }
+
+    public void Interact()
     {
         isOpen = true;
     }

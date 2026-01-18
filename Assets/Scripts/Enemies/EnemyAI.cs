@@ -8,7 +8,10 @@ public class EnemyAI : MonoBehaviour, ILoopResettable
 
     Vector3 startPosition;
     Quaternion startRotation;
+    Vector3 homePosition;
+    bool hasHome;
 
+    bool hasDetectedPlayer;
 
     [Header("Speeds")]
     public float patrolSpeed = 2f;
@@ -39,6 +42,25 @@ public class EnemyAI : MonoBehaviour, ILoopResettable
 
     private bool inCombat;
 
+    public bool IsUnaware()
+    {
+        return !hasDetectedPlayer;
+    }
+
+    public void ForceChase(Vector3 playerPos)
+    {
+        currentState = EnemyState.Chase;
+        patrol.StopPatrol();
+        agent.speed = chaseSpeed;
+        agent.SetDestination(playerPos);
+    }
+
+    public void DisableAI()
+    {
+        agent.isStopped = true;
+        enabled = false;
+    }
+
 
     void Awake()
     {
@@ -49,6 +71,9 @@ public class EnemyAI : MonoBehaviour, ILoopResettable
 
         startPosition = transform.position;
         startRotation = transform.rotation;
+
+        patrol.ResumePatrol();
+        agent.isStopped = false;
     }
 
     void Update()
@@ -75,6 +100,22 @@ public class EnemyAI : MonoBehaviour, ILoopResettable
                 break;
         }
     }
+
+    public void SetHome(Vector3 pos)
+    {
+        homePosition = pos;
+        hasHome = true;
+    }
+
+    public void ReturnHome()
+    {
+        if (!hasHome) return;
+
+        NavMeshAgent agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        agent.SetDestination(homePosition);
+    }
+
+
 
     // ================= STATES =================
 
@@ -139,7 +180,11 @@ public class EnemyAI : MonoBehaviour, ILoopResettable
 
         if (searchTimer <= 0f)
         {
-            EnterPatrol();
+            if (searchTimer <= 0f)
+            {
+                agent.SetDestination(homePosition);
+                EnterPatrol(); // or idle state
+            }
         }
     }
 
@@ -149,6 +194,8 @@ public class EnemyAI : MonoBehaviour, ILoopResettable
     {
         if (inCombat) return;
 
+        hasDetectedPlayer = false;
+
         currentState = EnemyState.Patrol;
         agent.speed = patrolSpeed;
         patrol.ResumePatrol();
@@ -157,6 +204,7 @@ public class EnemyAI : MonoBehaviour, ILoopResettable
 
     void EnterChase()
     {
+        hasDetectedPlayer = true;
         currentState = EnemyState.Chase;
         patrol.StopPatrol();
         agent.speed = chaseSpeed;
@@ -166,6 +214,7 @@ public class EnemyAI : MonoBehaviour, ILoopResettable
 
     void EnterSearch()
     {
+        hasDetectedPlayer = false;
         currentState = EnemyState.Search;
         searchTimer = searchDuration;
         agent.speed = patrolSpeed;
@@ -183,31 +232,58 @@ public class EnemyAI : MonoBehaviour, ILoopResettable
         inCombat = pause;
     }
 
+    public void EnterRest(Transform restSpot)
+    {
+        PauseChase(true);
+        agent.isStopped = true;
+
+        transform.position = restSpot.position;
+        transform.rotation = restSpot.rotation;
+
+        patrol.enabled = false;
+    }
+
+    public void ExitRest()
+    {
+        patrol.enabled = true;
+        agent.isStopped = false;
+        PauseChase(false);
+    }
 
     public void ResetState()
     {
+
         // Stop everything
         StopAllCoroutines();
 
-        // Reset NavMeshAgent safely
-        agent.isStopped = true;
-        agent.ResetPath();
+        agent.enabled = false;
 
         // Teleport enemy back
         transform.position = startPosition;
         transform.rotation = startRotation;
 
-        // Force NavMeshAgent to re-sync
-        agent.Warp(startPosition);
+        agent.enabled = true;
+
         agent.isStopped = false;
 
+        hasDetectedPlayer = false; 
+        inCombat = false;
+
+        // Force NavMeshAgent to re-sync
+        agent.Warp(startPosition);
+        
+        // Reset NavMeshAgent safely
+        agent.isStopped = true;
+        agent.ResetPath();
         // Reset AI state
         currentState = EnemyState.Patrol;
         searchTimer = 0f;
         isPaused = false;
 
         // Resume patrol
+        patrol.enabled = true;
         patrol.ResumePatrol();
+
 
         // Reset visuals
         SetEyeColor(patrolColor);

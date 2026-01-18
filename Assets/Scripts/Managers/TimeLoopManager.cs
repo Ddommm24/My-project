@@ -6,6 +6,8 @@ using System.Linq;
 public class TimeLoopManager : MonoBehaviour
 {
     public static TimeLoopManager Instance;
+    public const float SHIFT_CHANGE_TIME = 76f;
+    private float elapsedTime;
 
     [Header("Loop Settings")]
     public float loopDuration = 300f; // 5 minutes
@@ -31,15 +33,18 @@ public class TimeLoopManager : MonoBehaviour
     void Start()
     {
         timeRemaining = loopDuration;
+        elapsedTime = 0f;
 
-        // Save initial player state
         playerStartPos = player.position;
         playerStartRot = player.rotation;
     }
 
     void Update()
     {
-        timeRemaining -= Time.deltaTime;
+        float dt = Time.deltaTime;
+
+        timeRemaining -= dt;
+        elapsedTime += dt;
 
         if (timeRemaining <= 0f)
         {
@@ -49,6 +54,10 @@ public class TimeLoopManager : MonoBehaviour
         if (showTime)
         {
             timeText.text = GetFormattedTime();
+        }
+        if (Keyboard.current != null && Keyboard.current.vKey.wasPressedThisFrame)
+        {
+            ResetLoop();
         }
     }
 
@@ -85,12 +94,15 @@ public class TimeLoopManager : MonoBehaviour
         if (cc) cc.enabled = true;
 
         // Notify everything else
-        MonoBehaviour[] allMono = FindObjectsOfType<MonoBehaviour>();
+        MonoBehaviour[] allMono = FindObjectsOfType<MonoBehaviour>(true);
         ILoopResettable[] resettables = allMono.OfType<ILoopResettable>().ToArray();
         foreach (var obj in resettables)
         {
             obj.ResetState();
         }
+
+        timeRemaining = loopDuration;
+        elapsedTime = 0f;
     }
 
     public void ResetLoopFromDeath()
@@ -112,5 +124,9 @@ public class TimeLoopManager : MonoBehaviour
         return $"{minutes:00}:{seconds:00}";
     }
 
+    public float GetElapsedTime()
+    {
+        return elapsedTime;
+    }
 
 }

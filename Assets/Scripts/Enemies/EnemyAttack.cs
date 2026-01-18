@@ -8,6 +8,8 @@ public class EnemyAttack : MonoBehaviour
     public float attackCooldown = 1f;
     public float damage = 20f;
 
+    public bool disabled;
+
     private float lastAttackTime;
     private NavMeshAgent agent;
     private Transform player;
@@ -26,6 +28,9 @@ public class EnemyAttack : MonoBehaviour
 
     void Update()
     {
+        if (disabled)
+            return;
+
         if (!enemyAI.IsChasing)
             return;
 
@@ -53,21 +58,28 @@ public class EnemyAttack : MonoBehaviour
 
         playerStats.TakeDamage(damage);
 
-        StartCoroutine(HitPause());
+        StartCoroutine(HitSlowdown());
     }
 
-    IEnumerator HitPause()
+    IEnumerator HitSlowdown()
     {
-        agent.isStopped = true;
-        enemyAI.PauseChase(true);
+        float originalSpeed = agent.speed;
+        agent.speed = originalSpeed * 0.1f;
 
-        yield return new WaitForSeconds(1f);
+        float timer = 3f;
+        while (timer > 0f)
+        {
+            timer -= Time.deltaTime;
 
-        agent.isStopped = false;
-        enemyAI.PauseChase(false);
+            // keep chasing player
+            if (enemyAI.IsChasing)
+                agent.SetDestination(player.position);
 
-        // FORCE RETURN TO CHASE
-        agent.SetDestination(player.position);
+            yield return null;
+        }
+
+        agent.speed = originalSpeed;
     }
+
 
 }

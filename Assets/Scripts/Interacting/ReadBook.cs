@@ -1,79 +1,45 @@
 using UnityEngine;
-using TMPro;
 using UnityEngine.UI;
+using TMPro;
 
-[System.Serializable]
-public class BookPage
-{
-    public Sprite image;
-
-    [TextArea(3, 6)]
-    public string caption;
-}
-
-public class ReadBook : MonoBehaviour
+public class ReadBook : MonoBehaviour, IInteractable
 {
     public static bool IsReading { get; private set; }
 
-    [Header("UI")]
-    public TMP_Text promptText;
+    public int Priority => 10;
+
     public GameObject bookUI;
     public Image pageImage;
     public TMP_Text captionText;
-    public TMP_Text pageIndicator;
+    public TMP_Text pageNumberText;
 
-    [Header("Pages")]
-    public BookPage[] pages;
+    public int codeIndex = 3; // the book gives the 4th number
 
-    [Header("Interaction")]
-    public float interactDistance = 3f;
+    public Sprite[] pages;
+    public string[] captions;
 
-    private Camera cam;
-    private int currentPage;
+    private int page;
 
     void Start()
     {
-        cam = Camera.main;
-        promptText.gameObject.SetActive(false);
         bookUI.SetActive(false);
     }
 
-    void Update()
+    public bool CanInteract()
     {
-        if (!IsReading)
-            CheckForLook();
-        else
-            HandleReadingInput();
+        return !IsReading;
     }
 
-    void CheckForLook()
+    public string GetPromptText()
     {
-        Ray ray = new Ray(cam.transform.position, cam.transform.forward);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit, interactDistance))
-        {
-            if (hit.collider.GetComponentInParent<ReadBook>() == this)
-            {
-                promptText.gameObject.SetActive(true);
-                promptText.text = "Press E to read book";
-
-                if (Input.GetKeyDown(KeyCode.E))
-                    StartReading();
-
-                return;
-            }
-        }
-
-        promptText.gameObject.SetActive(false);
+        return "Press E to Read Book";
     }
 
-    void StartReading()
+    public void Interact()
     {
         IsReading = true;
-        currentPage = 0;
+        page = 0;
 
-        promptText.gameObject.SetActive(false);
         bookUI.SetActive(true);
         UpdatePage();
 
@@ -81,46 +47,55 @@ public class ReadBook : MonoBehaviour
         Cursor.visible = true;
     }
 
-    void HandleReadingInput()
+    void Update()
     {
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-            NextPage();
+        if (!IsReading) return;
 
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-            PreviousPage();
+        if (Input.GetKeyDown(KeyCode.RightArrow)) NextPage();
+        if (Input.GetKeyDown(KeyCode.LeftArrow)) PrevPage();
 
         if (Input.GetKeyDown(KeyCode.Escape))
-            ExitReading();
+            CloseBook();
     }
 
     void NextPage()
     {
-        if (currentPage < pages.Length - 1)
+        if (page < pages.Length - 1)
         {
-            currentPage++;
+            page++;
             UpdatePage();
         }
     }
 
-    void PreviousPage()
+    void PrevPage()
     {
-        if (currentPage > 0)
+        if (page > 0)
         {
-            currentPage--;
+            page--;
             UpdatePage();
         }
     }
 
     void UpdatePage()
     {
-        pageImage.sprite = pages[currentPage].image;
-        captionText.text = pages[currentPage].caption;
+        pageImage.sprite = pages[page];
 
-        if (pageIndicator != null)
-            pageIndicator.text = $"Page {currentPage + 1} / {pages.Length}";
+        if (page == pages.Length - 1 && DoorCodeManager.Instance != null)
+        {
+            int number = DoorCodeManager.Instance.GetNumber(0);
+            captionText.text =
+                $"1990 - Our Holiday at Hotel {number}";
+        }
+        else
+        {
+            captionText.text = captions[page];
+        }
+
+        pageNumberText.text = $"{page + 1} / {pages.Length}";
     }
 
-    void ExitReading()
+
+    void CloseBook()
     {
         IsReading = false;
         bookUI.SetActive(false);

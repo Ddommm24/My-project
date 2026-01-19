@@ -4,6 +4,8 @@
 #
 .utmp/
 [Ll]ibrary/
+*[Tt]utorial/
+[Ll]ibrary/
 *Tutorial/
 /[Ll]ibrary/
 /[Tt]emp/

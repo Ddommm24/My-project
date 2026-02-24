@@ -22,6 +22,16 @@ public class TimeLoopManager : MonoBehaviour
     public TMP_Text timeText;
     private bool showTime;
 
+    [Header("Checkpoint Transforms")]
+    public Transform tutorialStartPoint;
+    public Transform mainGameStartPoint;
+
+    [Header("Spawn Points")]
+    public Transform tutorialSpawn;
+    public Transform mainGameSpawn;
+
+
+
     void Awake()
     {
         if (Instance == null)
@@ -35,8 +45,8 @@ public class TimeLoopManager : MonoBehaviour
         timeRemaining = loopDuration;
         elapsedTime = 0f;
 
-        playerStartPos = player.position;
-        playerStartRot = player.rotation;
+        SetSpawnPointToCurrentPhase();
+
     }
 
     void Update()
@@ -84,26 +94,30 @@ public class TimeLoopManager : MonoBehaviour
 
         timeRemaining = loopDuration;
 
-        // Reset player
+        Transform resetPoint =
+            GamePhaseManager.Instance.CurrentPhase == GamePhase.Tutorial
+            ? tutorialStartPoint
+            : mainGameStartPoint;
+
         CharacterController cc = player.GetComponent<CharacterController>();
         if (cc) cc.enabled = false;
 
-        player.position = playerStartPos;
-        player.rotation = playerStartRot;
+        player.position = resetPoint.position;
+        player.rotation = resetPoint.rotation;
 
         if (cc) cc.enabled = true;
 
         // Notify everything else
         MonoBehaviour[] allMono = FindObjectsOfType<MonoBehaviour>(true);
-        ILoopResettable[] resettables = allMono.OfType<ILoopResettable>().ToArray();
-        foreach (var obj in resettables)
+        foreach (var obj in allMono)
         {
-            obj.ResetState();
+            if (obj is ILoopResettable resettable)
+                resettable.ResetState();
         }
 
-        timeRemaining = loopDuration;
         elapsedTime = 0f;
     }
+
 
     public void ResetLoopFromDeath()
     {
@@ -128,5 +142,22 @@ public class TimeLoopManager : MonoBehaviour
     {
         return elapsedTime;
     }
+
+    public void SetSpawnPointToCurrentPhase()
+    {
+        if (GamePhaseManager.Instance.CurrentPhase == GamePhase.Tutorial)
+        {
+            playerStartPos = tutorialSpawn.position;
+            playerStartRot = tutorialSpawn.rotation;
+        }
+        else
+        {
+            playerStartPos = mainGameSpawn.position;
+            playerStartRot = mainGameSpawn.rotation;
+        }
+
+        Debug.Log("Loop anchor updated to " + GamePhaseManager.Instance.CurrentPhase);
+    }
+
 
 }

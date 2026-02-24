@@ -22,6 +22,8 @@ public class PlayerStats : MonoBehaviour, ILoopResettable
     [Header("UI")]
     public Slider healthBar;
     public Slider staminaBar;
+    public TMP_Text healthText;
+    public TMP_Text staminaText;
 
     [Header("Death Fade")]
     public CanvasGroup deathFade;
@@ -88,6 +90,17 @@ public class PlayerStats : MonoBehaviour, ILoopResettable
         isExhausted ? Color.cyan : Color.green;
         healthBar.fillRect.GetComponent<Image>().color =
         isLow ? Color.yellow : Color.red;
+
+        healthText.color = isLow ? Color.red : Color.white;
+        staminaText.alpha = isExhausted ? 0.5f : 1f;
+
+
+        if (healthText != null)
+        healthText.text = $"{Mathf.CeilToInt(currentHealth)}";
+
+    if (staminaText != null)
+        staminaText.text = $"{Mathf.CeilToInt(currentStamina)}";
+
     }
 
     public void TakeDamage(float amount)

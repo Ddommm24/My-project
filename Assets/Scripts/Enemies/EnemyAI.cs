@@ -289,5 +289,12 @@ public class EnemyAI : MonoBehaviour, ILoopResettable
         SetEyeColor(patrolColor);
     }
 
+    public void OverrideStartPosition(Vector3 pos)
+    {
+        startPosition = pos;
+        startRotation = transform.rotation;
+    }
+
+
 
 }

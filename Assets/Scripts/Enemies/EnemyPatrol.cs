@@ -20,8 +20,10 @@ public class EnemyPatrol : MonoBehaviour, ILoopResettable
         return currentIndex;
     }
 
-    [Range(0, 55)]
-    public int startingWaypointIndex = 0;
+    public int GetWaypointCount()
+    {
+        return patrolPoints != null ? patrolPoints.Length : 0;
+    }
 
 
     private NavMeshAgent agent;
@@ -44,7 +46,6 @@ public class EnemyPatrol : MonoBehaviour, ILoopResettable
             patrolPoints[i] = waypointParent.GetChild(i);
         }
 
-        currentIndex = startingWaypointIndex % patrolPoints.Length;
         GoToNextPoint();
     }
 
@@ -134,9 +135,8 @@ public class EnemyPatrol : MonoBehaviour, ILoopResettable
     {
         isPatrolling = true;
         waitTimer = 0f;
-        currentIndex = startingWaypointIndex;
 
-        if (agent != null && agent.enabled)
+        if (agent != null && agent.enabled && patrolPoints.Length > 0)
         {
             agent.ResetPath();
             agent.SetDestination(patrolPoints[currentIndex].position);

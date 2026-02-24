@@ -17,6 +17,7 @@ public class PlayerInventory : MonoBehaviour, ILoopResettable
 
     public bool HasScrewdriver => items.Contains("Screwdriver");
     public bool HasAxe => items.Contains("Axe");
+    public bool HasGateKey => items.Contains("GateKey");
 
     public void AddItem(string id)
     {

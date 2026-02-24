@@ -10,7 +10,7 @@ public class PlayerInteractor : MonoBehaviour
     public Camera playerCamera;
 
     private IInteractable current;
-
+    
     void Start()
     {
         if (playerCamera == null)
@@ -47,8 +47,6 @@ public class PlayerInteractor : MonoBehaviour
 
             IInteractable[] interactables = hit.collider.GetComponentsInParent<IInteractable>();
 
-            Debug.Log("Turtle hit: ");
-
             IInteractable best = null;
             int bestPriority = int.MinValue;
 
@@ -65,8 +63,6 @@ public class PlayerInteractor : MonoBehaviour
 
             if (best != null)
             {
-                Debug.Log("Sloth hit: ");
-
                 current = best;
                 promptText.text = best.GetPromptText();
                 promptText.gameObject.SetActive(true);

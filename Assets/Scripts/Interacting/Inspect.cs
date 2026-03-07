@@ -16,7 +16,6 @@ public class Inspect : MonoBehaviour, IInteractable
     [TextArea(5, 10)]
     public string description;
 
-    private bool inspecting;
 
     void Start()
     {
@@ -29,17 +28,25 @@ public class Inspect : MonoBehaviour, IInteractable
         if (requiresUnlock && !unlocked)
             return false;
 
-        return !inspecting;
+        return !UIState.IsInspecting;
     }
 
     public string GetPromptText()
     {
-        return "Press E to Inspect";
+        if (!UIState.IsInspecting) 
+        {
+            return "Press E to Inspect";
+        }
+        else
+        {
+            return "";
+        }
+        
     }
 
     public void Interact()
     {
-        inspecting = true;
+        UIState.IsInspecting = true;
         descriptionText.gameObject.SetActive(true);
 
         if (codeIndex == 1 && DoorCodeManager.Instance != null)
@@ -69,7 +76,7 @@ public class Inspect : MonoBehaviour, IInteractable
 
     void Update()
     {
-        if (!inspecting) return;
+        if (!UIState.IsInspecting) return;
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -80,7 +87,9 @@ public class Inspect : MonoBehaviour, IInteractable
 
     void Close()
     {
-        inspecting = false;
+        UIState.IsInspecting = false;
         descriptionText.gameObject.SetActive(false);
+        UIState.LeftInspecting = true;
+
     }
 }

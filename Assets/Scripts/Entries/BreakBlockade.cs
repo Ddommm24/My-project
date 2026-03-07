@@ -1,17 +1,17 @@
 using UnityEngine;
 
-public class BreakableBlockade : MonoBehaviour, IInteractable, ILoopResettable
+public class BreakableBlockade : MonoBehaviour, IInteractable
 {
-    public string requiredItemId = "Axe";
-    public string routeId;
-
+    public FacilityEntrance entrance;
     public int Priority => 10;
-
-    bool broken;
 
     public bool CanInteract()
     {
-        if (broken) return false;
+        if (!EntryRouteManager.Instance.HasEverEntered())
+            return false;
+
+        if (EntryRouteManager.Instance.HasEverBroken())
+            return false;
 
         return PlayerInventory.Instance.HasAxe;
     }
@@ -23,15 +23,7 @@ public class BreakableBlockade : MonoBehaviour, IInteractable, ILoopResettable
 
     public void Interact()
     {
-        broken = true;
-        gameObject.SetActive(false);
-
-        EntryRouteManager.Instance.MarkRouteUsed(routeId);
-    }
-
-    public void ResetState()
-    {
-        broken = false;
-        gameObject.SetActive(true);
+        EntryRouteManager.Instance.MarkBroken();
+        entrance.HideForThisLoop();
     }
 }

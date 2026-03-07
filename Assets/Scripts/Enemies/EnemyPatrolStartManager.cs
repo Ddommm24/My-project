@@ -15,8 +15,6 @@ public class EnemyPatrolStartManager : MonoBehaviour, ILoopResettable
 
     public void AssignRandomStartPoints()
     {
-        Debug.Log("AssignRandomStartPoints CALLED");
-
         usedIndices.Clear();
 
         if (enemies.Length == 0) return;
@@ -26,11 +24,16 @@ public class EnemyPatrolStartManager : MonoBehaviour, ILoopResettable
 
         foreach (var enemy in enemies)
         {
+            if (!enemy.patrolEnabled)
+                continue;
+
+            if (enemy.waypointParent == null)
+                continue;
 
             int index = GetSpacedRandomIndex(waypointCount);
             usedIndices.Add(index);
 
-            Debug.Log($"{enemy.name} assigned random waypoint {index}");
+            //Debug.Log($"{enemy.name} assigned random waypoint {index}");
 
             enemy.SetPatrolIndex(index);
             WarpEnemyToWaypoint(enemy, index);
@@ -64,7 +67,7 @@ public class EnemyPatrolStartManager : MonoBehaviour, ILoopResettable
 
     int GetSpacedRandomIndex(int max)
     {
-        const int MAX_ATTEMPTS = 50;
+        const int MAX_ATTEMPTS = 100;
 
         for (int i = 0; i < MAX_ATTEMPTS; i++)
         {
@@ -73,7 +76,12 @@ public class EnemyPatrolStartManager : MonoBehaviour, ILoopResettable
 
             foreach (int used in usedIndices)
             {
-                if (Mathf.Abs(candidate - used) < minWaypointSpacing)
+                int directDistance = Mathf.Abs(candidate - used);
+                int loopDistance = max - directDistance;
+
+                int actualDistance = Mathf.Min(directDistance, loopDistance);
+
+                if (actualDistance < minWaypointSpacing)
                 {
                     tooClose = true;
                     break;
@@ -84,7 +92,7 @@ public class EnemyPatrolStartManager : MonoBehaviour, ILoopResettable
                 return candidate;
         }
 
-        // Fallback if space is tight
+        // If spacing impossible (too many enemies for waypoint count)
         return Random.Range(0, max);
     }
 

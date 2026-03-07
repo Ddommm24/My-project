@@ -17,6 +17,13 @@ public class MouseMovement : MonoBehaviour
 
     void Update()
     {
+        if (UIState.IsUIOpen)
+            return;
+            
+        if (Time.timeScale == 0f)
+            return;
+
+
         // Apply the input to camera rotation
         float mouseX = lookInput.x * mouseSensitivity;
         float mouseY = lookInput.y * mouseSensitivity;

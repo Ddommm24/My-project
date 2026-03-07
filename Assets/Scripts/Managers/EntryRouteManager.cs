@@ -1,11 +1,11 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public class EntryRouteManager : MonoBehaviour
 {
     public static EntryRouteManager Instance;
 
-    private Dictionary<string, int> routeStages = new();
+    private bool hasEverEntered;
+    private bool hasEverBroken;
 
     void Awake()
     {
@@ -17,29 +17,16 @@ public class EntryRouteManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    public int GetRouteStage(string routeId)
-    {
-        if (!routeStages.ContainsKey(routeId))
-            routeStages[routeId] = 0;
+    public bool HasEverEntered() => hasEverEntered;
+    public bool HasEverBroken() => hasEverBroken;
 
-        return routeStages[routeId];
+    public void MarkEntered()
+    {
+        hasEverEntered = true;
     }
 
-    public void MarkRouteUsed(string routeId)
+    public void MarkBroken()
     {
-        if (!routeStages.ContainsKey(routeId))
-            routeStages[routeId] = 0;
-
-        routeStages[routeId]++;
-    }
-
-    public bool IsRouteLocked(string routeId)
-    {
-        return GetRouteStage(routeId) >= 2;
-    }
-
-    public void ResetAll()
-    {
-        routeStages.Clear();
+        hasEverBroken = true;
     }
 }

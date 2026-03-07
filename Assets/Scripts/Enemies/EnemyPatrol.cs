@@ -32,21 +32,23 @@ public class EnemyPatrol : MonoBehaviour, ILoopResettable
     private float waitTimer;
     private bool isPatrolling = true;
 
-    void Start()
+    void Awake()
     {
         if (!patrolEnabled)
-        return;
+            return;
+
+        if (waypointParent == null)
+        {
+            Debug.LogWarning($"{name} has patrolEnabled but no waypointParent assigned.");
+            patrolEnabled = false;
+            return;
+        }
 
         agent = GetComponent<NavMeshAgent>();
-        agent.speed = patrolSpeed;
 
         patrolPoints = new Transform[waypointParent.childCount];
         for (int i = 0; i < waypointParent.childCount; i++)
-        {
             patrolPoints[i] = waypointParent.GetChild(i);
-        }
-
-        GoToNextPoint();
     }
 
     void Update()
@@ -133,13 +135,19 @@ public class EnemyPatrol : MonoBehaviour, ILoopResettable
 
     public void ResetState()
     {
+        if (!patrolEnabled || patrolPoints == null || patrolPoints.Length == 0)
+            return;
+
         isPatrolling = true;
         waitTimer = 0f;
 
-        if (agent != null && agent.enabled && patrolPoints.Length > 0)
+        if (agent != null && agent.enabled)
         {
             agent.ResetPath();
-            agent.SetDestination(patrolPoints[currentIndex].position);
+
+            // Move to NEXT waypoint, not current
+            int nextIndex = (currentIndex + 1) % patrolPoints.Length;
+            agent.SetDestination(patrolPoints[nextIndex].position);
         }
     }
 

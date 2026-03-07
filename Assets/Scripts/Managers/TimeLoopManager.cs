@@ -30,7 +30,7 @@ public class TimeLoopManager : MonoBehaviour
     public Transform tutorialSpawn;
     public Transform mainGameSpawn;
 
-
+    bool loopStopped = false;
 
     void Awake()
     {
@@ -51,14 +51,17 @@ public class TimeLoopManager : MonoBehaviour
 
     void Update()
     {
-        float dt = Time.deltaTime;
-
-        timeRemaining -= dt;
-        elapsedTime += dt;
-
-        if (timeRemaining <= 0f)
+        if (!loopStopped)
         {
-            ResetLoop();
+            float dt = Time.deltaTime;
+
+            timeRemaining -= dt;
+            elapsedTime += dt;
+
+            if (timeRemaining <= 0f)
+            {
+                ResetLoop();
+            }
         }
 
         if (showTime)
@@ -67,6 +70,8 @@ public class TimeLoopManager : MonoBehaviour
         }
         if (Keyboard.current != null && Keyboard.current.vKey.wasPressedThisFrame)
         {
+            if (UIState.IsUIOpen)
+                return;
             ResetLoop();
         }
     }
@@ -90,6 +95,7 @@ public class TimeLoopManager : MonoBehaviour
 
     public void ResetLoop()
     {
+        
         Debug.Log("TIME LOOP RESET");
 
         timeRemaining = loopDuration;
@@ -159,5 +165,8 @@ public class TimeLoopManager : MonoBehaviour
         Debug.Log("Loop anchor updated to " + GamePhaseManager.Instance.CurrentPhase);
     }
 
-
+    public void StopLoopTimer()
+    {
+        loopStopped = true;
+    }
 }

@@ -6,29 +6,47 @@ public class InventoryUI : MonoBehaviour
     public GameObject panel;
     public TMP_Text itemsText;
 
-    bool open;
+    bool open = false;
 
-    void Start()
-    {
-        panel.SetActive(false);
-    }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.I))
+        if (!open && Input.GetKeyDown(KeyCode.I) && !UIState.IsUIOpen)
         {
-            Toggle();
+            Open();
+        }
+        else if (open && Input.GetKeyDown(KeyCode.Escape))
+        {
+            Close();
         }
     }
 
-    void Toggle()
+    void Open()
     {
-        open = !open;
-        panel.SetActive(open);
+        open = true;
+        panel.SetActive(true);
+        UIState.IsUIOpen = true;
 
-        if (open)
-            Refresh();
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        Debug.Log("Inventory Open Called");
+
+        Refresh();
     }
+
+    void Close()
+    {
+        open = false;
+        panel.SetActive(false);
+        UIState.IsUIOpen = false;
+        UIState.EscapeConsumed = true;
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+    }
+
 
     void Refresh()
     {
@@ -40,7 +58,7 @@ public class InventoryUI : MonoBehaviour
         if (PlayerInventory.Instance.HasScrewdriver)
             itemsText.text += "- Screwdriver\n";
 
-    if (PlayerInventory.Instance.HasAxe)
+        if (PlayerInventory.Instance.HasAxe)
             itemsText.text += "- Axe\n";
 
         if (itemsText.text == "")

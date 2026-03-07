@@ -4,7 +4,7 @@ using TMPro;
 
 public class ReadBook : MonoBehaviour, IInteractable
 {
-    public static bool IsReading { get; private set; }
+    public static ReadBook ActiveBook { get; private set; }
 
     public int Priority => 10;
 
@@ -16,6 +16,7 @@ public class ReadBook : MonoBehaviour, IInteractable
     public int codeIndex = 3; // the book gives the 4th number
 
     public Sprite[] pages;
+    [TextArea(3, 10)]
     public string[] captions;
 
     private int page;
@@ -27,17 +28,25 @@ public class ReadBook : MonoBehaviour, IInteractable
 
     public bool CanInteract()
     {
-        return !IsReading;
+        return ActiveBook == null;
     }
 
     public string GetPromptText()
     {
-        return "Press E to Read Book";
+        if (ReadBook.ActiveBook != null)
+        {
+            return "";
+        }
+        else
+        {
+            return "Press E to Read Book";
+        }
+  
     }
 
     public void Interact()
     {
-        IsReading = true;
+        ActiveBook = this;
         page = 0;
 
         bookUI.SetActive(true);
@@ -49,7 +58,7 @@ public class ReadBook : MonoBehaviour, IInteractable
 
     void Update()
     {
-        if (!IsReading) return;
+        if (ActiveBook != this) return;
 
         if (Input.GetKeyDown(KeyCode.RightArrow)) NextPage();
         if (Input.GetKeyDown(KeyCode.LeftArrow)) PrevPage();
@@ -80,7 +89,7 @@ public class ReadBook : MonoBehaviour, IInteractable
     {
         pageImage.sprite = pages[page];
 
-        if (page == pages.Length - 1 && DoorCodeManager.Instance != null)
+        if (page == 4 && DoorCodeManager.Instance != null)
         {
             int number = DoorCodeManager.Instance.GetNumber(0);
             captionText.text =
@@ -97,7 +106,9 @@ public class ReadBook : MonoBehaviour, IInteractable
 
     void CloseBook()
     {
-        IsReading = false;
+        UIState.EscapeConsumed = true; 
+
+        ActiveBook = null;
         bookUI.SetActive(false);
 
         Cursor.lockState = CursorLockMode.Locked;

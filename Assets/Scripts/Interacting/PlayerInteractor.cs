@@ -23,17 +23,20 @@ public class PlayerInteractor : MonoBehaviour
 
         if (current != null && Input.GetKeyDown(KeyCode.E))
         {
+            promptText.gameObject.SetActive(false);
             current.Interact();
-        }        
+            current = null;
+        }
     }
 
     void CheckInteractable()
     {
-        if (ReadBook.IsReading)
-            return;
-
+        
         current = null;
         promptText.gameObject.SetActive(false);
+
+        if (ReadBook.ActiveBook != null)
+            return;
 
         if (playerCamera == null)
             return;

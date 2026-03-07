@@ -1,9 +1,8 @@
 using UnityEngine;
 
-public class EntranceTrigger : MonoBehaviour
+public class EntranceTrigger : MonoBehaviour, ILoopResettable
 {
     public FacilityEntrance entrance;
-
     bool triggered;
 
     void OnTriggerEnter(Collider other)
@@ -13,5 +12,10 @@ public class EntranceTrigger : MonoBehaviour
 
         triggered = true;
         entrance.OnPlayerEntered();
+    }
+
+    public void ResetState()
+    {
+        triggered = false;
     }
 }

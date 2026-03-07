@@ -13,7 +13,7 @@ public class PlayerMovement : MonoBehaviour
     public float speed = 10f;
     public float runSpeed = 20f;
     public float gravity = -9.81f * 2;
-    public float jumpHeight = 3f;
+    public float jumpHeight = 2f;
 
     public Transform groundCheck;
     public float groundDistance = 0.4f;
@@ -48,6 +48,8 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (UIState.IsUIOpen)
+            return;
         //checking if we hit the ground to reset our falling velocity, otherwise we will fall faster the next time
         isGrounded = controller.isGrounded;
 
@@ -95,6 +97,13 @@ public class PlayerMovement : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
+        if (UIState.IsUIOpen)
+            return;
+        if (!isGrounded)
+        {
+            return;
+        }
+            
         if (context.started)
         {
             jumpPressed = true;

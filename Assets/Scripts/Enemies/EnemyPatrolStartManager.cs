@@ -33,8 +33,6 @@ public class EnemyPatrolStartManager : MonoBehaviour, ILoopResettable
             int index = GetSpacedRandomIndex(waypointCount);
             usedIndices.Add(index);
 
-            //Debug.Log($"{enemy.name} assigned random waypoint {index}");
-
             enemy.SetPatrolIndex(index);
             WarpEnemyToWaypoint(enemy, index);
             enemy.ResetState();
@@ -59,7 +57,7 @@ public class EnemyPatrolStartManager : MonoBehaviour, ILoopResettable
 
         if (ai != null)
         {
-            ai.SetHome(wp.position);   // optional
+            ai.SetHome(wp.position);
             ai.OverrideStartPosition(wp.position);
         }
     }
@@ -92,7 +90,6 @@ public class EnemyPatrolStartManager : MonoBehaviour, ILoopResettable
                 return candidate;
         }
 
-        // If spacing impossible (too many enemies for waypoint count)
         return Random.Range(0, max);
     }
 

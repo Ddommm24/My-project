@@ -117,7 +117,7 @@ public class EnemyAI : MonoBehaviour, ILoopResettable
 
 
 
-    // ================= STATES =================
+    // States
 
     void HandlePatrol()
     {
@@ -183,12 +183,12 @@ public class EnemyAI : MonoBehaviour, ILoopResettable
             if (searchTimer <= 0f)
             {
                 agent.SetDestination(homePosition);
-                EnterPatrol(); // or idle state
+                EnterPatrol();
             }
         }
     }
 
-    // ================= TRANSITIONS =================
+    // Transitions
 
     void EnterPatrol()
     {
@@ -269,23 +269,17 @@ public class EnemyAI : MonoBehaviour, ILoopResettable
         hasDetectedPlayer = false; 
         inCombat = false;
 
-        // Force NavMeshAgent to re-sync
         agent.Warp(startPosition);
         
-        // Reset NavMeshAgent safely
         agent.isStopped = true;
         agent.ResetPath();
-        // Reset AI state
         currentState = EnemyState.Patrol;
         searchTimer = 0f;
         isPaused = false;
 
-        // Resume patrol
         patrol.enabled = true;
         patrol.ResumePatrol();
 
-
-        // Reset visuals
         SetEyeColor(patrolColor);
     }
 

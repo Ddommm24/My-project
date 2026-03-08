@@ -13,7 +13,7 @@ public class ReadBook : MonoBehaviour, IInteractable
     public TMP_Text captionText;
     public TMP_Text pageNumberText;
 
-    public int codeIndex = 3; // the book gives the 4th number
+    public int codeIndex = 3; // gives the 4th number
 
     public Sprite[] pages;
     [TextArea(3, 10)]

@@ -113,7 +113,6 @@ public class TimeLoopManager : MonoBehaviour
 
         if (cc) cc.enabled = true;
 
-        // Notify everything else
         MonoBehaviour[] allMono = FindObjectsOfType<MonoBehaviour>(true);
         foreach (var obj in allMono)
         {

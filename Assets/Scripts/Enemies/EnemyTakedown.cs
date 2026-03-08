@@ -136,12 +136,11 @@ public class EnemyTakedown : MonoBehaviour, IInteractable, ILoopResettable
     {
         disabled = true;
 
-        // KILL TAKEDOWN OWNERSHIP COMPLETELY
         enabled = false;
 
         Collider myCol = GetComponent<Collider>();
         if (myCol != null)
-            myCol.enabled = false; // REQUIRED
+            myCol.enabled = false;
 
         EnemyAttack attack = GetComponentInParent<EnemyAttack>();
         if (attack != null)

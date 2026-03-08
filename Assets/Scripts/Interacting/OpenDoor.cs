@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class OpenDoor : MonoBehaviour, IInteractable, ILoopResettable
 {
-    public Transform door;          // assign DoorCube
+    public Transform door;
     public Vector3 openOffset = new Vector3(0, 3f, 0);
     public float openSpeed = 3f;
 

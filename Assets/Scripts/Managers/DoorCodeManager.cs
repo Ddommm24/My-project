@@ -25,7 +25,7 @@ public class DoorCodeManager : MonoBehaviour
     {
         for (int i = 0; i < 4; i++)
         {
-            codeNumbers[i] = Random.Range(1, 101); // 1–100
+            codeNumbers[i] = Random.Range(1, 101);
         }
 
         Debug.Log(

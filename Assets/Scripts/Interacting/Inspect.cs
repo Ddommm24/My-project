@@ -7,7 +7,7 @@ public class Inspect : MonoBehaviour, IInteractable
     public bool requiresUnlock = false;
     public bool unlocked = true;
 
-    public int codeIndex = -1; // 0–3, -1 = normal inspect
+    public int codeIndex = -1; // 0–3 are for the random code digits, -1 is normal inspect
 
     public int Priority => 10;
     

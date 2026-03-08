@@ -73,7 +73,6 @@ public class FacilityClock : MonoBehaviour, ILoopResettable
         int mins = Mathf.FloorToInt(displayMins);
         int secs = Mathf.RoundToInt(displaySecs);
 
-        // handle rollover if rounding pushes secs to 60
         if (secs >= 60)
         {
             secs = 0;

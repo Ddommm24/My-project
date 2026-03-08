@@ -58,8 +58,6 @@ public class OpenGate : MonoBehaviour, IInteractable, ILoopResettable
         GamePhaseManager.Instance.CompleteTutorial();
 
         TimeLoopManager.Instance.SetSpawnPointToCurrentPhase();
-
-        //TimeLoopManager.Instance.ResetLoop();
         
     }
 

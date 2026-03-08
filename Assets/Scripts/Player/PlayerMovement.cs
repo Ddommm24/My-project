@@ -45,12 +45,10 @@ public class PlayerMovement : MonoBehaviour
             Destroy(gameObject);
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (UIState.IsUIOpen)
             return;
-        //checking if we hit the ground to reset our falling velocity, otherwise we will fall faster the next time
         isGrounded = controller.isGrounded;
 
         if (isGrounded && velocity.y < 0)
@@ -65,7 +63,6 @@ public class PlayerMovement : MonoBehaviour
         
         float currentSpeed = isRunning ? runSpeed : speed;
 
-        // Get movement relative to camera
         Vector3 camForward = cameraTransform.forward;
         camForward.y = 0f;
         camForward.Normalize();
@@ -89,7 +86,7 @@ public class PlayerMovement : MonoBehaviour
         controller.Move(velocity * Time.deltaTime);
     }
 
-    // Called by Input System (PlayerInput component)
+    // Called by Input System
     public void OnMove(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();

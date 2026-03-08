@@ -16,7 +16,7 @@ public class PlayerStats : MonoBehaviour, ILoopResettable
     public float currentStamina;
     public float staminaDrain = 25f;
     public float staminaRegen = 20f;
-    public float staminaRecoverThreshold = 0.5f; // 50%
+    public float staminaRecoverThreshold = 0.5f;
     public bool isExhausted;
 
     [Header("UI")]

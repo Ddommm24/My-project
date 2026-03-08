@@ -81,13 +81,11 @@ public class EnemyPatrol : MonoBehaviour, ILoopResettable
     }
 
 
-    // 🔹 CALLED BY EnemyAI
     public void StopPatrol()
     {
         isPatrolling = false;
     }
 
-    // 🔹 CALLED BY EnemyAI
     public void ResumePatrol()
     {
         if (!patrolEnabled) return;
@@ -106,7 +104,7 @@ public class EnemyPatrol : MonoBehaviour, ILoopResettable
         return new EnemyPatrolState
         {
             currentWaypoint = currentIndex,
-            waypointProgress = 0f // unused, but keeps struct valid
+            waypointProgress = 0f 
         };
     }
 
@@ -145,7 +143,7 @@ public class EnemyPatrol : MonoBehaviour, ILoopResettable
         {
             agent.ResetPath();
 
-            // Move to NEXT waypoint, not current
+            // Move to next waypoint
             int nextIndex = (currentIndex + 1) % patrolPoints.Length;
             agent.SetDestination(patrolPoints[nextIndex].position);
         }

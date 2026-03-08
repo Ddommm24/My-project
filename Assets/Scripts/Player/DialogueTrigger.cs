@@ -20,7 +20,6 @@ public class DialogueTrigger : MonoBehaviour, ILoopResettable
 
     void Start()
     {
-        // Use the same text component as the tutorial
         if (TutorialManager.Instance != null)
         {
             dialogueUI = TutorialManager.Instance.tutorialText;

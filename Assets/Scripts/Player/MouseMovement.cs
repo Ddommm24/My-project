@@ -24,7 +24,6 @@ public class MouseMovement : MonoBehaviour
             return;
 
 
-        // Apply the input to camera rotation
         float mouseX = lookInput.x * mouseSensitivity;
         float mouseY = lookInput.y * mouseSensitivity;
 
@@ -36,7 +35,6 @@ public class MouseMovement : MonoBehaviour
         transform.localRotation = Quaternion.Euler(xRotation, yRotation, 0f);
     }
 
-    // This must be public and take exactly one InputAction.CallbackContext parameter
     public void OnLook(InputAction.CallbackContext context)
     {
         lookInput = context.ReadValue<Vector2>();

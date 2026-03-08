@@ -120,7 +120,6 @@ public class EndingChoice : MonoBehaviour
 
         fadeGroup.alpha = 1f;
 
-        // Hold on black
         yield return new WaitForSeconds(3f);
 
         ShowEndScreen();

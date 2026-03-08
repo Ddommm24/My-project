@@ -43,8 +43,6 @@ public class PlayerInteractor : MonoBehaviour
 
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
 
-        //int mask = interactLayer;
-
         if (Physics.Raycast(ray, out RaycastHit hit, interactDistance, interactLayer, QueryTriggerInteraction.Collide))
         {
 

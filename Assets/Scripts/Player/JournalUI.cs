@@ -27,7 +27,6 @@ public class JournalUI : MonoBehaviour
             Close();
         }
 
-        // ENTER saves entry
         if (open && Input.GetKeyDown(KeyCode.Return))
         {
             SaveEntry();

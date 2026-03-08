@@ -71,7 +71,6 @@ public class EnemyAttack : MonoBehaviour
         {
             timer -= Time.deltaTime;
 
-            // keep chasing player
             if (enemyAI.IsChasing)
                 agent.SetDestination(player.position);
 

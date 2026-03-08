@@ -23480,12 +23480,12 @@ MonoBehaviour:
     requiredKey: 0
     startTriggerId: 
   - text: Use WASD to Move
-    minimumTime: 1
+    minimumTime: 0.5
     kind: 1
     requiredKey: 119
     startTriggerId: 
   - text: Hold Shift to Sprint
-    minimumTime: 1
+    minimumTime: 0.5
     kind: 1
     requiredKey: 304
     startTriggerId: 
@@ -23498,9 +23498,9 @@ MonoBehaviour:
 
       Press V to activate your time loop
       device and reset.'
-    minimumTime: 0
-    kind: 1
-    requiredKey: 118
+    minimumTime: 2
+    kind: 0
+    requiredKey: 0
     startTriggerId: ResetTrigger
   - text: Sometimes you'll need to find an item to progress...
     minimumTime: 2
@@ -76446,8 +76446,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 6.413727, y: 2.640142, z: 17.20111}
-  m_Center: {x: 0.5396576, y: -1.8531488, z: 1.6469421}
+  m_Size: {x: 5.418396, y: 6.624858, z: 17.20111}
+  m_Center: {x: 0.041992188, y: 0.13919863, z: 1.6469421}
 --- !u!114 &2083410793
 MonoBehaviour:
   m_ObjectHideFlags: 0

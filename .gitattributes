@@ -19,3 +19,17 @@
 *.mesh filter=lfs diff=lfs merge=lfs -text
 *.exr filter=lfs diff=lfs merge=lfs -text
 *.resS filter=lfs diff=lfs merge=lfs -text
+
+*.cs text
+*.shader text
+
+*.unity binary
+*.prefab binary
+*.asset binary
+*.mat binary
+*.anim binary
+*.controller binary
+*.lighting binary
+*.terrainlayer binary
+*.mask binary
+*.meta text
